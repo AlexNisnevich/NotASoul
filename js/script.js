@@ -20,16 +20,23 @@ var objectiveText = "I trust that you have already been briefed, Doctor, so this
 
 /* Sounds */
 
-var sndTypewriter = new Audio("sounds/typewriter.mp3");
-var sndTheme = new Audio("sounds/NotASoul.mp3");
-var sndThemePiano = new Audio("sounds/NotASoulPiano.mp3");
-var sndSelect = new Audio("sounds/click.mp3");
-var sndProgress = new Audio("sounds/coin.wav");
-var sndEnd = new Audio("sounds/end.mp3");
+// FF and Opera do not support mp3
+if ($.browser.mozilla || $.browser.opera) {
+	var extension = "wav";
+} else {
+	var extension = "mp3";
+}
 
-/* Game */
+var sndTypewriter = new Audio("sounds/typewriter." + extension);
+var sndTheme = new Audio("sounds/NotASoul." + extension);
+var sndThemePiano = new Audio("sounds/NotASoulPiano." + extension);
+var sndSelect = new Audio("sounds/click." + extension);
+var sndProgress = new Audio("sounds/coin." + extension);
+var sndEnd = new Audio("sounds/end." + extension);
 
 sndTheme.play();
+
+/* Game */
 
 function startGame() {
 	$('#progress').fadeOut();
@@ -379,14 +386,14 @@ function oneOf(strings) {
 
 /* Event Handlers */
 
-$('#playButton').click(function() {
-  event.preventDefault();
+$('#playButton').click(function(e) {
+  e.preventDefault();
   sndSelect.play();
   startGame();
 });
 
-$('#muteButton').click(function() {
-  event.preventDefault();
+$('#muteButton').click(function(e) {
+  e.preventDefault();
   sndSelect.play();
   mute();
 });
