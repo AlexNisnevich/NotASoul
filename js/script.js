@@ -7,12 +7,12 @@ var game = {
 	currentProgress: 0,
 	totalProgress: 6,
 	objectives: {
-		'whatAreYou': [false, 'Asked the patient who he is'],
-		'memories': [false, 'The patient acknowledged the existence of memories'],
-		'childhood': [false, 'The patient remembered his childhood passion for model airplanes'],
-		'love': [false, 'The patient remembered the love of his life'],
-		'war': [false, 'The patient remembered his service during World War III'],
-		'death': [false, 'The patient remembered his own death in Paris']
+		'whatAreYou': [false, 'Asked the patient who he is', 0],
+		'memories': [false, 'The patient acknowledged the existence of memories', 0],
+		'childhood': [false, 'The patient remembered his childhood passion for model airplanes', 0],
+		'love': [false, 'The patient remembered the love of his life', 0],
+		'war': [false, 'The patient remembered his service during World War III', 0],
+		'death': [false, 'The patient remembered his own death in Paris', 0]
 	}
 };
 
@@ -184,10 +184,17 @@ function processMsg(msg) {
 
 function runCommand(cmd) {
 	if (cmd == "help") {
-		typeMsg("The following commands are supported: \n /goal : repeats the Patient Status Report \n /leave : shut off the terminal \n /progress : view completed objectives", "command", 18, stopTyping); // TODO
+		typeMsg("The following commands are supported: \n /goal : repeats the Patient Status Report \n /hint : ask the Institute researchers for a hint \n /leave : shut off the terminal \n /progress : view completed objectives", "command", 18, stopTyping); // TODO
 	} else if (cmd == "goal") {
 		sndTypewriter.currentTime = 0;
 		typeMsg("--- Begin Patient Status Report --- \n " + objectiveText + " \n --- End Patient Status Report ---", "command", 16, stopTyping);
+	} else if (cmd == "hint") {
+		typeMsg("Requesting a hint. Please wait ...", "command", 16, 
+			function () {
+				stopTyping();
+				setTimeout(giveHint, 5000);
+			}
+		);
 	} else if (cmd == "leave") {
 		sndTypewriter.currentTime = 0;
 		typeMsg("Shutting off terminal ... \n Goodbye.", "command", 16, 
@@ -275,6 +282,27 @@ function gameOver() {
 	sndEnd.play();
 }
 
+function giveHint() {
+	var hint;
+	var doctors = ['WHITE', 'BLUE', 'GREEN', 'BLACK']
+	
+	if (!objectiveCompleted('whatAreYou')) {
+		hint = "To begin to treat the patient, you must first understand the depth of his delusion. Who does the patient think he is?";
+	} else if (!objectiveCompleted('memories')) {
+		hint = "We need something to work with. Does the patient still have at least some of his memories?";
+	} else if (!objectiveCompleted('childhood')) {
+		hint = "Many strong memories are typically formed during childhood. Does the patient remember anything about his family?";
+	} else if (!objectiveCompleted('love')) {
+		hint = "Powerful emotions lead to strong memories. Does the patient have any memories of love?";
+	} else if (!objectiveCompleted('war')) {
+		hint = "Historical events can underpin important memories, especially for their participants. Does the patient remember any notable events?";
+	} else if (!objectiveCompleted('death')) {
+		hint = "It looks like we're very close. All that's left is to find the most powerful memory of all. How did the patient die?";
+	}
+	
+	typeMsg("DR. " + oneOf(doctors) + ": " + hint, "command", 28, stopTyping);
+}
+
 function patientReply(msg) {
 	typeMsg("PATIENT: " + msg, "ai", 28, stopTyping);
 }
@@ -301,6 +329,14 @@ function objectiveComplete(obj) {
 
 function objectiveCompleted(obj) {
 	return game.objectives[obj][0];
+}
+
+function setObjectiveProgress(obj, progress) {
+	game.objectives[obj][2] = progress;
+}
+
+function getObjectiveProgress(obj) {
+	return game.objectives[obj][2];
 }
 
 function refreshProgress() {
