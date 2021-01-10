@@ -34,7 +34,14 @@ var sndSelect = new Audio("sounds/click." + extension);
 var sndProgress = new Audio("sounds/coin." + extension);
 var sndEnd = new Audio("sounds/end." + extension);
 
-sndTheme.play();
+// Put intro theme behind mousemove handler because user interaction is required to play sound now
+var introThemePlayed = false;
+document.body.addEventListener("mousemove", function () {
+	if (!introThemePlayed) {
+		sndTheme.play();
+		introThemePlayed = true;
+	}
+});
 
 /* Game */
 
